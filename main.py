@@ -2,10 +2,10 @@ import cv2
 import numpy as np
 from pyntcloud import PyntCloud
 
-import utils
+import utils, kitti_utils
 
 
-def main(img_path, pc_path, pc_type, homogeneous=True):
+def main(img_path, pc_path, pc_type, homogeneous=True, is_kitti=False):
 	
 	# read image
 	img = cv2.imread(img_path)
@@ -43,12 +43,17 @@ def main(img_path, pc_path, pc_type, homogeneous=True):
 	# TODO! (lidar read func. & own projection, crop 3d visualize?)
 
 	# calculate and read matrices
-	Rt, K, P = utils.calculate_matrices(homogeneous)
+	if is_kitti:
+		P = kitti_utils.calculate_matrices("assets/kitti_calib.txt")
+	else:	
+		Rt, K, P = utils.calculate_matrices(homogeneous)
 
 	
 	# transformations (extrensic and intrinsic)
 	projected_points = np.matmul(P, pc).T
 
+	#transformed_points = np.dot(Rt, pc)
+	#projected_points = np.matmul(K, transformed_points).T
 
 	temp = np.reshape( projected_points[:, 2], (-1, 1) )
 
@@ -60,10 +65,7 @@ def main(img_path, pc_path, pc_type, homogeneous=True):
 
 	for (idx, i) in enumerate(projected_points):
 
-		# TODO: fix depth color!
-		#color = int((pc[idx, 0] / depth_max) * 255)
-		color = 0
-		
+		color = int((pc[0, idx] / depth_max) * 255)
 		cv2.rectangle(img, (int(i[0] - 1), int(i[1] - 1)), (int(i[0] + 1), int(i[1] + 1)), (0, 0, color), -1)
 	
 	cv2.imshow("Projected Points", img)
@@ -73,6 +75,6 @@ def main(img_path, pc_path, pc_type, homogeneous=True):
 if __name__ == '__main__':
 	
 	img_path="assets/leaf_test.png"
-	pc_path="assets/leaf_test.pcd"
+	pc_path="assets/leaf_test.bin"
 	
-	main(img_path, pc_path, "pcd")
+	main(img_path, pc_path, "bin", is_kitti=False)

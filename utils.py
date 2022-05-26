@@ -34,7 +34,7 @@ def calculate_matrices(homogeneous: bool = True):
     )
     
     t = np.array(t).reshape(3, 1)
-    
+
     Rt = np.hstack([R, t])
     if homogeneous:
         Rt = np.vstack([Rt, np.array([0, 0, 0, 1])])
@@ -47,3 +47,7 @@ def calculate_matrices(homogeneous: bool = True):
         P = np.matmul(K, Rt)
 
     return Rt, K, P
+
+if __name__ == '__main__':
+    Rt, K, P = calculate_matrices(homogeneous=True)    
+    print(Rt)
