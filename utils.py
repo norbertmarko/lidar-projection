@@ -25,12 +25,12 @@ def calculate_matrices(homogeneous: bool = True):
     """
     
     K = [674.9000244140625, 0.0, 632.750244140625, 0.0, 674.9000244140625, 352.6859436035156, 0.0, 0.0, 1.0]
-    R = [np.pi / 2, -np.pi / 2, 0]
+    R = [1, -1, 0]
     t = [0.105, -0.580, 0.008]
 
     # build extrinsic matrix
     R = np.asarray(
-        Rotation.from_rotvec( np.array(R) ).as_matrix()
+        Rotation.from_euler('xyz', np.pi / 2 * np.array(R) ).as_matrix()
     )
     
     t = np.array(t).reshape(3, 1)
@@ -38,16 +38,15 @@ def calculate_matrices(homogeneous: bool = True):
     Rt = np.hstack([R, t])
     if homogeneous:
         Rt = np.vstack([Rt, np.array([0, 0, 0, 1])])
-
+        
     # build intrinsic matrix
     K = np.array(K).reshape(3, 3)
     P = None    
     if homogeneous:
         K = np.hstack([np.array(K).reshape(3, 3), np.array([0, 0, 0]).reshape(3, 1)])
-        P = np.matmul(K, Rt)
+        P = np.dot(K, Rt)
 
     return Rt, K, P
 
 if __name__ == '__main__':
-    Rt, K, P = calculate_matrices(homogeneous=True)    
-    print(Rt)
+    Rt, K, P = calculate_matrices(homogeneous=True)

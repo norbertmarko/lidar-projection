@@ -42,3 +42,6 @@ def calculate_matrices(file_path):
     P = np.matmul(P, Tr)
 
     return P
+
+if __name__ == '__main__':
+    P = calculate_matrices('assets/kitti_calib.txt')

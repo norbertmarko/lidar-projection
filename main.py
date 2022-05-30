@@ -24,6 +24,9 @@ def main(img_path, pc_path, pc_type, homogeneous=True, is_kitti=False):
 
 	elif pc_type == "pcd":
 		pc = PyntCloud.from_file(pc_path)
+		
+		#filter by 'x'
+		pc.points = pc.points[pc.points["x"]>=0]
 
 		x = np.array(pc.points['x'], dtype=np.float32)
 		y = np.array(pc.points['y'], dtype=np.float32)
@@ -39,7 +42,7 @@ def main(img_path, pc_path, pc_type, homogeneous=True, is_kitti=False):
 	else:
 		print("[ERROR] Provide a valid point cloud type!")
    
-	# removing points behind image plane (approximate)
+	# removing points behind image plane (approximate) - bin version!
 	# TODO! (lidar read func. & own projection, crop 3d visualize?)
 
 	# calculate and read matrices
@@ -50,10 +53,15 @@ def main(img_path, pc_path, pc_type, homogeneous=True, is_kitti=False):
 
 	
 	# transformations (extrensic and intrinsic)
-	projected_points = np.matmul(P, pc).T
+	projected_points = np.dot(P, pc).T
 
 	#transformed_points = np.dot(Rt, pc)
-	#projected_points = np.matmul(K, transformed_points).T
+	#projected_points = np.dot(K, transformed_points).T
+
+	# normalize?
+	for i in range(3):
+		projected_points[i] /= projected_points[2]
+
 
 	temp = np.reshape( projected_points[:, 2], (-1, 1) )
 
@@ -75,6 +83,6 @@ def main(img_path, pc_path, pc_type, homogeneous=True, is_kitti=False):
 if __name__ == '__main__':
 	
 	img_path="assets/leaf_test.png"
-	pc_path="assets/leaf_test.bin"
+	pc_path="assets/leaf_test.pcd"
 	
-	main(img_path, pc_path, "bin", is_kitti=False)
+	main(img_path, pc_path, "pcd", is_kitti=False)
