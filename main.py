@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 from pyntcloud import PyntCloud
 
-import utils, kitti_utils
+import utils, kitti_utils, rellis_utils
 
 
 def main(img_path, pc_path, pc_type, homogeneous=True, is_kitti=False):
@@ -49,7 +49,7 @@ def main(img_path, pc_path, pc_type, homogeneous=True, is_kitti=False):
 	if is_kitti:
 		P = kitti_utils.calculate_matrices("assets/kitti_calib.txt")
 	else:	
-		Rt, K, P = utils.calculate_matrices(homogeneous)
+		Rt, K, P = rellis_utils.calculate_matrices(homogeneous)
 
 	
 	# transformations (extrensic and intrinsic)
@@ -82,7 +82,12 @@ def main(img_path, pc_path, pc_type, homogeneous=True, is_kitti=False):
 
 if __name__ == '__main__':
 	
+<<<<<<< HEAD
 	img_path="assets/leaf_test.png"
 	pc_path="assets/leaf_test.pcd"
+=======
+	img_path="assets/rellis.png"
+	pc_path="assets/rellis.pcd"
+>>>>>>> 7dfa7fc (Rellis 3D additions.)
 	
 	main(img_path, pc_path, "pcd", is_kitti=False)
