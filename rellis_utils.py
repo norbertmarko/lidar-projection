@@ -25,24 +25,24 @@ def calculate_matrices(homogeneous: bool = True):
     """
     
     # camera matrix
-    #K = [2787.812258, 0.000000, 881.039942, 0.000000, 2780.031855, 625.137965, 0.000000, 0.000000, 1.000000]
+    K = [2787.812258, 0.000000, 881.039942, 0.000000, 2780.031855, 625.137965, 0.000000, 0.000000, 1.000000]
     
     # (rectified?) projection matrix
     K = [2742.022949, 0.000000, 875.146045, 0.000000, 2763.256592, 625.599612, 0.000000, 0.000000, 1.000000]
     
     # os1_lidar
-    R = [-1.576, 0.009, 1.536]
-    t = [-0.132, 0.039, -0.172]
+    #R = [-1.576, 0.009, 1.536]
+    #t = [-0.132, 0.039, -0.172]
     
     # os1_sensor
-    #t = [0.132, -0.039, -0.136]
-    #R = [-1.576, 0.009, -1.606]
+    t = [0.132, -0.039, -0.136]
+    R = [-1.576, 0.009, -1.606]
 
     # build extrinsic matrix
     R = np.asarray(
-        Rotation.from_rotvec( np.array(R) ).as_matrix()
+        Rotation.from_euler('zyx', np.array(R) ).as_matrix()
     )
-    
+
     t = np.array(t).reshape(3, 1)
 
     Rt = np.hstack([R, t])
@@ -54,7 +54,7 @@ def calculate_matrices(homogeneous: bool = True):
     P = None    
     if homogeneous:
         K = np.hstack([np.array(K).reshape(3, 3), np.array([0, 0, 0]).reshape(3, 1)])
-        P = np.matmul(K, Rt)
+        P = np.dot(K, Rt)
 
     return Rt, K, P
 
