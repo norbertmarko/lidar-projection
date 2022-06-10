@@ -1,8 +1,22 @@
 import cv2
 import numpy as np
 from pyntcloud import PyntCloud
+import png
 
 import utils, kitti_utils, rellis_utils
+
+
+def save_img(output_path, img):
+        with open(output_path, 'wb') as f:
+            depth_image = (img * 256).astype(np.uint16)
+
+            # pypng is used because cv2 cannot 
+            # save images in uint16 format
+            writer = png.Writer(width=depth_image.shape[1],
+                                height=depth_image.shape[0],
+                                bitdepth=16,
+                                greyscale=False)
+            writer.write(f, depth_image)
 
 
 def main(img_path, pc_path, pc_type, homogeneous=True, is_kitti=False):
@@ -71,7 +85,7 @@ def main(img_path, pc_path, pc_type, homogeneous=True, is_kitti=False):
     dummy_img = np.zeros_like(img)
 
     # display projection on image
-    depth_max = np.max(pc[:, 0])
+    depth_max = np.max(pc[0, :])
 
     for (idx, i) in enumerate(projected_points):
 
@@ -81,7 +95,7 @@ def main(img_path, pc_path, pc_type, homogeneous=True, is_kitti=False):
     cv2.imshow("Projected Points", dummy_img)
     cv2.waitKey(0)
     cv2.imwrite("outputs/projected_raw/proj_pc_raw.png", dummy_img)
-
+    #save_img("outputs/projected_raw/proj_pc_raw.png", dummy_img)
 
 if __name__ == '__main__':
     
@@ -89,3 +103,7 @@ if __name__ == '__main__':
     pc_path="assets/leaf_test.pcd"
     
     main(img_path, pc_path, "pcd", is_kitti=False)
+
+    #TODO: 1. save it as uint16 properly
+    #TODO: 2. use smaller points for point cloud (make it close to kitti example projections)
+    #TODO: 3. scale depth properly (check with example bin - print values - think trough calc.)
